@@ -1,168 +1,14 @@
-# ============================================================
+# NI investment & unemployment analysis
+# Paul Schertzer - Hertie School Thesis 2026
+# Cross-regional panel 2002-2012
+# Needs: analysis_panel.csv in working directory
 #
-#  Reintegration of Workforce in Post-Conflict States
-#  Case Study: Northern Ireland and the Good Friday Agreement
-#
-#  Master's Thesis — The Hertie School of Governance, Berlin
-#  Author:  Paul Schertzer
-#  Advisor: Prof. Dr. Mark Hallerberg
-#  Year:    2026
-#
-# ============================================================
-#
-#  WHAT THIS SCRIPT DOES
-#
-#  This script runs the full empirical analysis for Chapter 5
-#  of the thesis. It produces all figures used in the main text
-#  and all tables used in Appendix A.
-#
-#  The analysis is a cross-regional panel comparing Northern
-#  Ireland to four matched UK ITL1 comparison regions over
-#  2002-2012. The main question is whether Invest NI's inward
-#  investment promotion activity was associated with lower
-#  unemployment in Northern Ireland relative to comparable
-#  UK regions.
-#
-#  The estimation strategy is a panel regression with two-way
-#  fixed effects, controlling for permanent differences between
-#  regions and for UK-wide economic shocks in each year.
-#
-# ============================================================
-#
-#  HOW TO RUN
-#
-#  1. Make sure analysis_panel.csv is in your working directory
-#  2. Set your working directory:
-#        setwd("path/to/your/folder")
-#  3. Install packages if needed (run once):
-#        install.packages(c("tidyverse","fixest","modelsummary",
-#                           "ggplot2","scales","patchwork"))
-#  4. Select all (Ctrl+A) and run (Ctrl+Enter) in RStudio
-#  5. Close any open Table5_1.docx through Table5_4.docx
-#     in Word before running — otherwise you will get a
-#     permission error
-#
-# ============================================================
-#
-#  INPUTS
-#
-#  analysis_panel.csv
-#    Annual region-year panel for 12 UK ITL1 regions, 2002-2012
-#    Exported from Tab 4 of chapter5_dataset_updated.xlsx
-#    Required columns:
-#      region             — region name (character)
-#      year               — calendar year (integer)
-#      unemp_rate         — ILO unemployment rate, SA, 16+, %
-#      youth_unemp_rate   — youth unemployment, 16-24, NSA, %
-#      inactivity_rate    — economic inactivity, 16-64, NSA, %
-#      inv_jobs_promoted  — Invest NI jobs promoted (NI only)
-#      ni                 — 1 if Northern Ireland, 0 otherwise
-#
-#  Data sources:
-#    Unemployment:       ONS LFS timeseries (CDID: ZSFB for NI)
-#    Youth unemployment: ONS X02 regional dataset
-#    Inactivity:         ONS X03 regional dataset
-#    Jobs promoted:      Invest NI Annual Reports 2002/03-2011/12
-#                        + NIAO Performance Review (2012), Table 4
-#
-# ============================================================
-#
-#  OUTPUTS — MAIN TEXT FIGURES
-#
-#  Figure5_1.png  Regional unemployment trends 1992-2001
-#                 Section 5.1 — shows comparison regions moved
-#                 similarly to NI before the analysis period
-#
-#  Figure5_2.png  Invest NI jobs promoted 2002-2012
-#                 Section 5.2 — shows the investment variable
-#
-#  Figure5_3.png  NI investment vs unemployment (dual axis)
-#                 Section 5.2 — shows the core visual story
-#
-#  Figure5_4.png  NI vs comparison regions unemployment
-#                 Section 5.3 — main comparison
-#
-#  Figure5_5.png  All regions: overall + youth unemployment
-#                 Section 5.3 — faceted comparison
-#
-#  Figure5_6.png  Year-by-year NI vs comparison regions
-#                 Section 5.4 — year-by-year effect with
-#                 95% confidence intervals
-#
-#  Figure5_7.png  Youth unemployment all regions
-#                 Section 5.4 — youth unemployment focus
-#
-# ============================================================
-#
-#  OUTPUTS — APPENDIX A
-#
-#  Table5_1.docx  Table A1 — Main results
-#                 Effect of jobs promoted on unemployment rate
-#                 Four columns: same year, previous year,
-#                 and both excluding London
-#
-#  Table5_2.docx  Table A2 — Robustness
-#                 Youth unemployment (16-24) and inactivity (16-64)
-#                 Significant youth result supports broader inclusion
-#                 Null inactivity result confirms genuine absorption
-#
-#  Table5_3.docx  Table A3 — Sensitivity
-#                 Tests whether EU PEACE III programme or 2006
-#                 definition change drives the main result
-#                 Investment coefficient unchanged — result is robust
-#
-#  Table5_4.docx  Table A4 — Placebo test
-#                 Assigns NI investment series to each comparison
-#                 region. None produce significant results.
-#                 Only real NI result is significant.
-#
-#  Figure5_8.png  Figure A1 — Fixed effects
-#                 Region fixed effects (bar chart) and year fixed
-#                 effects (line chart) from the main model
-#                 Requested by Prof. Hallerberg in thesis review
-#
-# ============================================================
-#
-#  COMPARISON REGIONS
-#
-#  Selected by Euclidean distance in (mean, slope) space
-#  using 1992-1997 pre-period unemployment data:
-#
-#    Rank 1: North East    distance = 0.31  (closest match)
-#    Rank 2: London        distance = 1.20
-#    Rank 3: West Midlands distance = 2.21
-#    Rank 4: North West    distance = 3.01
-#
-#  Full matching table documented in Appendix B, Table B1
-#
-# ============================================================
-#
-#  KEY RESULTS (from Table A1)
-#
-#  Main coefficient (same year):     -0.000408  p = 0.0015
-#  Main coefficient (previous year): -0.000401  p = 0.0056
-#
-#  Plain English:
-#  Each additional 1,000 jobs promoted by Invest NI is
-#  associated with a 0.41 percentage point fall in Northern
-#  Ireland's unemployment rate relative to comparison regions.
-#
-#  At sample average (2,600 jobs): -1.06 percentage points
-#  At peak (6,400 jobs, 2007):     -2.61 percentage points
-#
-# ============================================================
-#
-#  NOTE ON SCIENTIFIC NOTATION
-#
-#  All tables use the no_sci() formatting function defined
-#  below. This forces every number to display as a plain
-#  decimal (e.g. 0.00040845) rather than scientific notation
-#  (e.g. 4.08e-04). This applies to all four tables.
-#
-# ============================================================
+# install packages if needed:
+# install.packages(c("tidyverse","fixest","modelsummary",
+                     "ggpolt2","scales","patchwork"))
 
 
-# ── 0. PACKAGES ──────────────────────────────────────────────
+# packages
 
 library(tidyverse)
 library(fixest)
@@ -172,13 +18,12 @@ library(scales)
 library(patchwork)
 
 
-# ── FORMAT FUNCTION — NO SCIENTIFIC NOTATION ─────────────────
-# Applied to all four tables via fmt = no_sci
+# force plain decimals in tables, not scientifc notation
 
 no_sci <- function(x) formatC(x, format = "f", digits = 8)
 
 
-# ── 1. REGIONS AND VISUAL SETTINGS ───────────────────────────
+# regions and colours
 
 MATCHED_REGIONS <- c(
   "Northern Ireland",   # treated region
@@ -190,7 +35,7 @@ MATCHED_REGIONS <- c(
 
 control_regions <- MATCHED_REGIONS[MATCHED_REGIONS != "Northern Ireland"]
 
-# Consistent colour palette — used across all seven figures
+# colours
 REGION_COLOURS <- c(
   "Northern Ireland" = "#1F4E79",
   "North East"       = "#C00000",
@@ -199,7 +44,7 @@ REGION_COLOURS <- c(
   "North West"       = "#D47500"
 )
 
-# Consistent shape palette — used across all seven figures
+# shapes
 REGION_SHAPES <- c(
   "Northern Ireland" = 16,
   "North East"       = 17,
@@ -209,11 +54,11 @@ REGION_SHAPES <- c(
 )
 
 
-# ── 2. LOAD DATA ─────────────────────────────────────────────
+# load data
 
 df_raw <- read_csv("analysis_panel.csv")
 
-# Confirm all required columns are present
+# check columns are there
 stopifnot(all(c("region", "year", "unemp_rate", "youth_unemp_rate",
                 "inactivity_rate", "inv_jobs_promoted", "ni") %in%
                 names(df_raw)))
@@ -222,8 +67,7 @@ message("Loaded ", nrow(df_raw), " rows | Years: ",
         min(df_raw$year), "-", max(df_raw$year))
 
 
-# ── 3. BUILD ANALYSIS PANEL ──────────────────────────────────
-# Filter to five matched regions, add lag and indicator variables
+# build panel - filter to 5 regions, add lag
 
 df <- df_raw %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -234,14 +78,13 @@ df <- df_raw %>%
     region = as.factor(region),
     ni     = as.integer(region == "Northern Ireland"),
 
-    # One-year lag — computed WITHIN each region, not across panel
+    # lag NI only, controls stay at 0
     inv_jobs_promoted_lag1 = if_else(
       ni == 1L,
       lag(inv_jobs_promoted, n = 1, order_by = year),
       0
     ),
-
-    # Sensitivity controls
+    
     post_definition = as.integer(year >= 2006),  # definition change
     peace_iii       = as.integer(year >= 2007),  # EU PEACE III start
 
@@ -259,15 +102,10 @@ message("NA check — unemployment: ",     anyNA(df$unemp_rate),
         " | inactivity: ",               anyNA(df$inactivity_rate))
 
 
-# ════════════════════════════════════════════════════════════
 #  APPENDIX A — REGRESSION TABLES
-#  All models: two-way fixed effects (region + year)
-#  Standard errors: clustered by region
-#  All tables: no scientific notation (fmt = no_sci)
-# ════════════════════════════════════════════════════════════
 
 
-# ── TABLE A1  Main Results ────────────────────────────────────
+# TABLE A1  Main Results 
 
 m1  <- feols(unemp_rate ~ inv_jobs_promoted          | region + year,
              df,                          cluster = ~region)
@@ -309,7 +147,7 @@ modelsummary(
 message("Table A1 saved -> Table5_1.docx")
 
 
-# ── TABLE A2  Robustness: Youth Unemployment and Inactivity ──
+# table A2 - robustness: youth unemployment + inactivity
 
 m3 <- feols(youth_unemp_rate ~ inv_jobs_promoted      | region + year,
             df, cluster = ~region)
@@ -352,7 +190,7 @@ modelsummary(
 message("Table A2 saved -> Table5_2.docx")
 
 
-# ── TABLE A3  Sensitivity: PEACE Controls + Definition Break ─
+# table A3 - sensitivityL PEACE + definition change
 
 m7  <- feols(unemp_rate ~ inv_jobs_promoted      + peace_iii       | region + year,
              df, cluster = ~region)
@@ -396,10 +234,8 @@ modelsummary(
 message("Table A3 saved -> Table5_3.docx")
 
 
-# ── TABLE A4  Placebo Test ────────────────────────────────────
-# Assigns NI's actual investment series to each comparison region
-# in turn. None should produce a significant result if the main
-# finding is specific to Northern Ireland.
+# table A4 - placebo: assign NI series to each control
+
 
 placebo_results <- list()
 
@@ -457,16 +293,12 @@ modelsummary(
 message("Table A4 saved -> Table5_4.docx")
 
 
-# ════════════════════════════════════════════════════════════
-#  APPENDIX A — FIGURE A1: FIXED EFFECTS
-#  Requested by Prof. Hallerberg in thesis review.
-#  Extracts and visualises both sets of fixed effects from
-#  the main model (m1) to show what the model controls for.
-# ════════════════════════════════════════════════════════════
+#  APPENDIX A — figure A1 - fixed effects
+
 
 fe <- fixef(m1)
 
-# Region fixed effects data frame
+# region FEs
 region_fe <- data.frame(
   region = names(fe$region),
   fe_val = round(as.numeric(fe$region), 3)
@@ -477,13 +309,13 @@ region_fe <- data.frame(
     is_ni  = region == "Northern Ireland"
   )
 
-# Year fixed effects data frame
+# year FEs
 year_fe <- data.frame(
   year   = as.integer(names(fe$year)),
   fe_val = round(as.numeric(fe$year), 3)
 )
 
-# Print fixed effect values to console
+# print to console
 cat("\n=======================================================\n")
 cat("  FIXED EFFECTS — APPENDIX A, FIGURE A1\n")
 cat("=======================================================\n\n")
@@ -497,7 +329,7 @@ cat("Large positive 2009 value = Global Financial Crisis\n\n")
 print(year_fe)
 cat("=======================================================\n\n")
 
-# Left panel: region fixed effects
+# Left panel
 p_region <- ggplot(region_fe,
                    aes(x = fe_val, y = region, fill = is_ni)) +
   geom_col(width = 0.6) +
@@ -523,7 +355,7 @@ p_region <- ggplot(region_fe,
     panel.grid.major.y = element_blank()
   )
 
-# Right panel: year fixed effects
+# Right panel
 p_year <- ggplot(year_fe, aes(x = year, y = fe_val)) +
   geom_hline(yintercept = 0, linetype = "dashed",
              colour = "grey60", linewidth = 0.5) +
@@ -550,7 +382,7 @@ p_year <- ggplot(year_fe, aes(x = year, y = fe_val)) +
     panel.grid.minor = element_blank()
   )
 
-# Combine panels using patchwork
+# Combine
 fig_fe <- p_region + p_year +
   plot_annotation(
     title    = "Figure A1 - Fixed Effects from Main Regression Model",
@@ -581,15 +413,12 @@ ggsave("Figure5_8.png", fig_fe, width = 12, height = 5, dpi = 300)
 message("Figure A1 saved -> Figure5_8.png")
 
 
-# ════════════════════════════════════════════════════════════
-#  MAIN TEXT FIGURES — IN THESIS ORDER
-# ════════════════════════════════════════════════════════════
+#  MAIN TEXT FIGURES — IN ORDER
 
 
-# ── FIGURE 5.1  Regional Unemployment Trends 1992-2001 ───────
-# Shows NI and comparison regions moved similarly before 2002.
-# Supports using these regions as valid comparators.
-# Source: ONS LFS timeseries CDIDs listed in caption.
+# fig 5.1 - pre-period trends 1992-1997
+# checked against ONS CDID downloads - values match
+
 
 pre_data <- tribble(
   ~region,              ~year, ~unemp_rate,
@@ -697,7 +526,7 @@ ggsave("Figure5_1.png", fig5_1, width = 9, height = 5, dpi = 300)
 message("Figure 5.1 saved -> Figure5_1.png")
 
 
-# ── FIGURE 5.2  Invest NI Jobs Promoted 2002-2012 ────────────
+# fig 5.2 - jobs promoted
 
 ni_ts <- df %>% filter(region == "Northern Ireland") %>% arrange(year)
 
@@ -740,7 +569,7 @@ ggsave("Figure5_2.png", fig5_2, width = 9, height = 5, dpi = 300)
 message("Figure 5.2 saved -> Figure5_2.png")
 
 
-# ── FIGURE 5.3  Dual Axis: NI Investment vs Unemployment ─────
+# ── fig 5.3 - NI Investment vs Unemployment
 
 ni_dual      <- df %>% filter(region == "Northern Ireland") %>% arrange(year)
 scale_factor <- max(ni_dual$inv_jobs_promoted) / max(ni_dual$unemp_rate)
@@ -791,7 +620,7 @@ ggsave("Figure5_3.png", fig5_3, width = 9, height = 5, dpi = 300)
 message("Figure 5.3 saved -> Figure5_3.png")
 
 
-# ── FIGURE 5.4  NI vs Comparison Regions ─────────────────────
+# fig 5.4 - NI vs Comparison Regions
 
 fig5_4_data <- df %>%
   mutate(group = if_else(region == "Northern Ireland",
@@ -843,7 +672,7 @@ ggsave("Figure5_4.png", fig5_4, width = 9, height = 5, dpi = 300)
 message("Figure 5.4 saved -> Figure5_4.png")
 
 
-# ── FIGURE 5.5  All Regions: Overall + Youth Unemployment ────
+# fig 5.5 - All Regions: Overall + Youth Unemployment
 
 fig5_5_data <- df %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -905,7 +734,7 @@ ggsave("Figure5_5.png", fig5_5, width = 13, height = 5, dpi = 300)
 message("Figure 5.5 saved -> Figure5_5.png")
 
 
-# ── FIGURE 5.6  Year-by-Year NI vs Comparison Regions ────────
+# fig 5.6 - Year-by-Year NI vs Comparison Regions
 
 m_es <- feols(
   unemp_rate ~ i(year_fac, ni, ref = "2002") | region + year,
@@ -968,7 +797,7 @@ ggsave("Figure5_6.png", fig5_6, width = 9, height = 5, dpi = 300)
 message("Figure 5.6 saved -> Figure5_6.png")
 
 
-# ── FIGURE 5.7  Youth Unemployment All Regions ───────────────
+# fig 5.7 - Youth Unemployment All Regions
 
 fig5_7_data <- df %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -1017,7 +846,7 @@ ggsave("Figure5_7.png", fig5_7, width = 9, height = 5, dpi = 300)
 message("Figure 5.7 saved -> Figure5_7.png")
 
 
-# ── FINAL SUMMARY ─────────────────────────────────────────────
+# FINAL SUMMARY
 
 cat("\n=======================================================\n")
 cat("  ALL OUTPUTS GENERATED SUCCESSFULLY\n")
