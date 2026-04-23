@@ -98,7 +98,7 @@ df <- df_raw %>%
     year   = as.integer(year),
     region = as.factor(region),
     ni     = as.integer(region == "Northern Ireland"),
-
+    
     # lag NI only, controls stay at 0
     inv_jobs_promoted_lag1 = if_else(
       ni == 1L,
@@ -108,7 +108,7 @@ df <- df_raw %>%
     
     post_definition = as.integer(year >= 2006),  # definition change
     peace_iii       = as.integer(year >= 2007),  # EU PEACE III start
-
+    
     year_fac = factor(year)
   ) %>%
   ungroup() %>%
@@ -260,12 +260,12 @@ message("Table A3 saved -> Table5_3.docx")
 placebo_results <- list()
 
 for (placebo_region in control_regions) {
-
+  
   ni_investment <- df_raw %>%
     filter(region == "Northern Ireland") %>%
     arrange(year) %>%
     pull(inv_jobs_promoted)
-
+  
   df_placebo <- df_raw %>%
     filter(region %in% MATCHED_REGIONS) %>%
     arrange(region, year) %>%
@@ -276,7 +276,7 @@ for (placebo_region in control_regions) {
       inv_treat = if_else(region == placebo_region, ni_investment, 0)
     ) %>%
     ungroup()
-
+  
   m_p <- tryCatch(
     feols(unemp_rate ~ inv_treat | region + year,
           data = df_placebo, cluster = ~region),
@@ -504,11 +504,11 @@ fig5_1 <- ggplot(pre_data,
                      colour = region,
                      linewidth = (region == "Northern Ireland"),
                      shape = region)) +
-  annotate("rect", xmin = 1997.5, xmax = 2001.5,
+  annotate("rect", xmin = 1998.2, xmax = 2001.5,
            ymin = -Inf, ymax = Inf, alpha = 0.04, fill = "#1F4E79") +
-  geom_vline(xintercept = 1997.5, linetype = "dotted",
+  geom_vline(xintercept = 1998.2, linetype = "dotted",
              colour = "#1F4E79", linewidth = 0.5) +
-  annotate("text", x = 1997.7, y = 14.2,
+  annotate("text", x = 1997.4, y = 14.2,
            label = "Good Friday\nAgreement (1998)",
            size = 2.8, colour = "#1F4E79", hjust = 0) +
   geom_line() +
@@ -613,7 +613,7 @@ fig5_3 <- ggplot(ni_dual, aes(x = year)) +
   ) +
   labs(
     title    = "Figure 5.3 - Northern Ireland: Investment Activity and Unemployment Rate, 2002-2012",
-    subtitle = "Bars = Invest NI jobs promoted (right axis). Line = NI unemployment rate (left axis).",
+    subtitle = "BARS = Invest NI jobs promoted (right axis, 0-8,000). Line = NI unemploymenmt rate (left axis, 0-7.5%)",
     x = NULL,
     caption  = paste(
       "Sources: Invest NI Annual Reports 2002/03-2011/12; NIAO (2012); ONS LFS timeseries ZSFB.",
