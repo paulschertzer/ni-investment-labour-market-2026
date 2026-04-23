@@ -1,12 +1,33 @@
-# NI investment & unemployment analysis
-# Paul Schertzer - Hertie School Thesis 2026
-# Cross-regional panel 2002-2012
-# Needs: analysis_panel.csv in working directory
+# ============================================================
 #
-# install packages if needed:
-# install.packages(c("tidyverse","fixest","modelsummary",
-                     "ggpolt2","scales","patchwork"))
-
+#  Jobs for Peace? Inward Investment and Unemployment in Post-Agreement Northern 
+#  Ireland 
+#  Evidence from 2002 - 2012
+#
+#  Master's Thesis — The Hertie School of Governance, Berlin
+#  Author:  Paul Schertzer
+#  Year:    2026
+#
+#  The analysis is a cross-regional panel comparing Northern
+#  Ireland to four matched UK ITL1 comparison regions over
+#  2002-2012. The main question is whether Invest NI's inward
+#  investment promotion activity was associated with lower
+#  unemployment in Northern Ireland relative to comparable
+#  UK regions.
+#
+#  The estimation strategy is a panel regression with two-way
+#  fixed effects, controlling for permanent differences between
+#  regions and for UK-wide economic shocks in each year.
+#
+#
+#  Data sources:
+#    Unemployment:       ONS LFS timeseries (CDID: ZSFB for NI)
+#    Youth unemployment: ONS X02 regional dataset
+#    Inactivity:         ONS X03 regional dataset
+#    Jobs promoted:      Invest NI Annual Reports 2002/03-2011/12
+#                        + NIAO Performance Review (2012), Table 4
+#
+#
 
 # packages
 
@@ -18,7 +39,7 @@ library(scales)
 library(patchwork)
 
 
-# force plain decimals in tables, not scientifc notation
+# force plain decimals in tables, not scientific notation
 
 no_sci <- function(x) formatC(x, format = "f", digits = 8)
 
@@ -58,7 +79,7 @@ REGION_SHAPES <- c(
 
 df_raw <- read_csv("analysis_panel.csv")
 
-# check columns are there
+# Confirm all required columns are present
 stopifnot(all(c("region", "year", "unemp_rate", "youth_unemp_rate",
                 "inactivity_rate", "inv_jobs_promoted", "ni") %in%
                 names(df_raw)))
@@ -67,7 +88,7 @@ message("Loaded ", nrow(df_raw), " rows | Years: ",
         min(df_raw$year), "-", max(df_raw$year))
 
 
-# build panel - filter to 5 regions, add lag
+# build analysis panel - filter to 5 regions, add lag
 
 df <- df_raw %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -102,10 +123,10 @@ message("NA check — unemployment: ",     anyNA(df$unemp_rate),
         " | inactivity: ",               anyNA(df$inactivity_rate))
 
 
-#  APPENDIX A — REGRESSION TABLES
+# regression tables for appendix A
 
 
-# TABLE A1  Main Results 
+# TABLE A1 - MAIN RESULTS
 
 m1  <- feols(unemp_rate ~ inv_jobs_promoted          | region + year,
              df,                          cluster = ~region)
@@ -147,7 +168,7 @@ modelsummary(
 message("Table A1 saved -> Table5_1.docx")
 
 
-# table A2 - robustness: youth unemployment + inactivity
+# TABLE A2 - ROBUSTNESS: YOUTH UNEMPLOYMENT + INACTIVITY
 
 m3 <- feols(youth_unemp_rate ~ inv_jobs_promoted      | region + year,
             df, cluster = ~region)
@@ -190,7 +211,7 @@ modelsummary(
 message("Table A2 saved -> Table5_2.docx")
 
 
-# table A3 - sensitivityL PEACE + definition change
+# TABLE A3 - SENSITIVTY: PEACE + DEFINITION CHANGE
 
 m7  <- feols(unemp_rate ~ inv_jobs_promoted      + peace_iii       | region + year,
              df, cluster = ~region)
@@ -234,8 +255,7 @@ modelsummary(
 message("Table A3 saved -> Table5_3.docx")
 
 
-# table A4 - placebo: assign NI series to each control
-
+# TABLE A4 - PLACEBO: ASSIGN NI SERIES TO EACH CONTROL
 
 placebo_results <- list()
 
@@ -293,8 +313,7 @@ modelsummary(
 message("Table A4 saved -> Table5_4.docx")
 
 
-#  APPENDIX A — figure A1 - fixed effects
-
+# FIGURE A1 - FIXED EFFECTS
 
 fe <- fixef(m1)
 
@@ -413,11 +432,9 @@ ggsave("Figure5_8.png", fig_fe, width = 12, height = 5, dpi = 300)
 message("Figure A1 saved -> Figure5_8.png")
 
 
-#  MAIN TEXT FIGURES — IN ORDER
+# main text figures
 
-
-# fig 5.1 - pre-period trends 1992-1997
-# checked against ONS CDID downloads - values match
+# FIGURE 5.1  Regional Unemployment Trends 1992-2001
 
 
 pre_data <- tribble(
@@ -569,7 +586,7 @@ ggsave("Figure5_2.png", fig5_2, width = 9, height = 5, dpi = 300)
 message("Figure 5.2 saved -> Figure5_2.png")
 
 
-# ── fig 5.3 - NI Investment vs Unemployment
+# fig 5.3 - NI Investment vs Unemployment
 
 ni_dual      <- df %>% filter(region == "Northern Ireland") %>% arrange(year)
 scale_factor <- max(ni_dual$inv_jobs_promoted) / max(ni_dual$unemp_rate)
@@ -672,7 +689,7 @@ ggsave("Figure5_4.png", fig5_4, width = 9, height = 5, dpi = 300)
 message("Figure 5.4 saved -> Figure5_4.png")
 
 
-# fig 5.5 - All Regions: Overall + Youth Unemployment
+# fig 5.5 All Regions: Overall + Youth Unemployment
 
 fig5_5_data <- df %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -734,7 +751,7 @@ ggsave("Figure5_5.png", fig5_5, width = 13, height = 5, dpi = 300)
 message("Figure 5.5 saved -> Figure5_5.png")
 
 
-# fig 5.6 - Year-by-Year NI vs Comparison Regions
+# fig 5.6 Year-by-Year NI vs Comparison Regions
 
 m_es <- feols(
   unemp_rate ~ i(year_fac, ni, ref = "2002") | region + year,
@@ -797,7 +814,7 @@ ggsave("Figure5_6.png", fig5_6, width = 9, height = 5, dpi = 300)
 message("Figure 5.6 saved -> Figure5_6.png")
 
 
-# fig 5.7 - Youth Unemployment All Regions
+# fig 5.7 Youth Unemployment All Regions
 
 fig5_7_data <- df %>%
   filter(region %in% MATCHED_REGIONS) %>%
@@ -846,7 +863,7 @@ ggsave("Figure5_7.png", fig5_7, width = 9, height = 5, dpi = 300)
 message("Figure 5.7 saved -> Figure5_7.png")
 
 
-# FINAL SUMMARY
+# ── FINAL SUMMARY ─────────────────────────────────────────────
 
 cat("\n=======================================================\n")
 cat("  ALL OUTPUTS GENERATED SUCCESSFULLY\n")
