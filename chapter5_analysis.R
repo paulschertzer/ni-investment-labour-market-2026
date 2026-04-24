@@ -521,7 +521,7 @@ fig5_1 <- ggplot(pre_data,
   scale_y_continuous(limits = c(4, 15)) +
   labs(
     title    = "Figure 5.1 - Unemployment Trends Before 2002: Northern Ireland and Comparison Regions",
-    subtitle = "All five regions followed broadly similar downward trajectories before the analysis period begins, supporting their use as valid comparators for Northern Ireland.",
+    subtitle = "All five regions followed broadly similar downward trajectories before the analysis period begins, supporting their use as valid comparators.",
     x = NULL, y = "Unemployment rate (%)",
     caption  = paste(
       "Source: ONS LFS timeseries 1992-2001 (CDIDs ZSFB, YCNC, YCNI, YCNG, YCND).",
@@ -666,7 +666,7 @@ fig5_4 <- ggplot(fig5_4_data,
   ) +
   labs(
     title    = "Figure 5.4 - Unemployment Rate: Northern Ireland vs Comparison Regions, 2002-2012",
-    subtitle = "Annual ILO unemployment rate (%), seasonally adjusted. Comparison regions: unweighted average of North East, London, West Midlands, North West.",
+    subtitle = "Annual ILO unemployment rate (%), seasonally adjusted. Comparison regions: North East, London, West Midlands, North West.",
     x = NULL, y = "Unemployment rate (%)",
     colour = NULL, linetype = NULL,
     caption  = paste(
